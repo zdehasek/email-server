@@ -12,17 +12,33 @@ cat <<DNS
 Publish these DNS records:
 
 $PRIMARY_DOMAIN. MX 10 $MAIL_HOSTNAME.
-$MAIL_HOSTNAME. A $SERVER_PUBLIC_IPV4
-$WEBMAIL_HOSTNAME. A $SERVER_PUBLIC_IPV4
-$DAV_HOSTNAME. A $SERVER_PUBLIC_IPV4
+DNS
+
+declare -A printed_hosts=()
+print_host_record() {
+  local host="$1"
+  local type="$2"
+  local value="$3"
+  local key="$host|$type|$value"
+  [[ -n "$host" ]] || return 0
+  [[ -z "${printed_hosts[$key]:-}" ]] || return 0
+  printed_hosts[$key]=1
+  printf '%s. %s %s\n' "$host" "$type" "$value"
+}
+
+print_host_record "$MAIL_HOSTNAME" A "$SERVER_PUBLIC_IPV4"
+print_host_record "$WEBMAIL_HOSTNAME" A "$SERVER_PUBLIC_IPV4"
+print_host_record "$DAV_HOSTNAME" A "$SERVER_PUBLIC_IPV4"
+
+cat <<DNS
 $PRIMARY_DOMAIN. TXT "v=spf1 mx -all"
 _dmarc.$PRIMARY_DOMAIN. TXT "v=DMARC1; p=none; rua=mailto:dmarc@$PRIMARY_DOMAIN; adkim=s; aspf=s"
 DNS
 
 if [[ -n "${SERVER_PUBLIC_IPV6:-}" ]]; then
-  printf '%s. AAAA %s\n' "$MAIL_HOSTNAME" "$SERVER_PUBLIC_IPV6"
-  printf '%s. AAAA %s\n' "$WEBMAIL_HOSTNAME" "$SERVER_PUBLIC_IPV6"
-  printf '%s. AAAA %s\n' "$DAV_HOSTNAME" "$SERVER_PUBLIC_IPV6"
+  print_host_record "$MAIL_HOSTNAME" AAAA "$SERVER_PUBLIC_IPV6"
+  print_host_record "$WEBMAIL_HOSTNAME" AAAA "$SERVER_PUBLIC_IPV6"
+  print_host_record "$DAV_HOSTNAME" AAAA "$SERVER_PUBLIC_IPV6"
 fi
 
 dkim_txt="/etc/mailserver/dkim/$PRIMARY_DOMAIN/$DKIM_SELECTOR.txt"
