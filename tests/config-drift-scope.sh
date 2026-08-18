@@ -4,6 +4,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 script="$ROOT_DIR/scripts/config-drift.sh"
+cli="$ROOT_DIR/mailserver.sh"
 
 if grep -Fq 'warn_state "config-drift is scoped' "$script"; then
   printf 'config-drift scope disclaimer must not increment warning count\n' >&2
@@ -12,6 +13,11 @@ fi
 
 if ! grep -Fq 'info "config-drift is scoped' "$script"; then
   printf 'Expected config-drift scope disclaimer to remain as info\n' >&2
+  exit 1
+fi
+
+if ! grep -Fq 'config-drift) cmd_option_script scripts/config-drift.sh false "${COMMAND_ARGS[@]}" ;;' "$cli"; then
+  printf 'Expected mailserver config-drift wrapper to pass options through\n' >&2
   exit 1
 fi
 

@@ -1979,7 +1979,7 @@ main() {
     dns-state) cmd_option_script scripts/dns-state.sh false "${COMMAND_ARGS[@]}" ;;
     check-ssl) cmd_simple_script scripts/check-ssl.sh false "${COMMAND_ARGS[@]}" ;;
     service-state) cmd_simple_script scripts/service-state.sh false "${COMMAND_ARGS[@]}" ;;
-    config-drift) cmd_simple_script scripts/config-drift.sh false "${COMMAND_ARGS[@]}" ;;
+    config-drift) cmd_option_script scripts/config-drift.sh false "${COMMAND_ARGS[@]}" ;;
     e2e-delivery) cmd_option_script scripts/e2e-delivery-test.sh true "${COMMAND_ARGS[@]}" ;;
     tls-policy-state) cmd_option_script scripts/tls-policy-state.sh false "${COMMAND_ARGS[@]}" ;;
     rspamd-state) cmd_option_script scripts/rspamd-state.sh true "${COMMAND_ARGS[@]}" ;;
